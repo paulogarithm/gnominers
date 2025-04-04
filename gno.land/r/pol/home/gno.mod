@@ -1,1 +1,1 @@
-module gno.land/r/paulogarithm/home
+module gno.land/r/pol/home

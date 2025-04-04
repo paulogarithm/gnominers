@@ -15,6 +15,12 @@ func (rm *Machine) xorshift64star() uint64 {
 	rm.seed ^= rm.seed << 25
 	rm.seed ^= rm.seed >> 27
 	return rm.seed * 2685821657736338717
+
+	// const a = 1664525
+    // const c = 1013904223
+    // const m = 4294967296
+    // rm.seed = (a*rm.seed + c) % m
+	// return 1
 }
 
 func (rm *Machine) RandFloat() float64 {
@@ -39,4 +45,8 @@ func (r *Machine) RandInt(min, max int) int {
 
 func (rm *Machine) GenerateInt() int {
 	return int(rm.xorshift64star())
+}
+
+func Hello() int {
+	return 42
 }
