@@ -12,11 +12,13 @@ const (
 	gnominersPath = "/r/pol/gnominers"
 	gnominersShopPath = gnominersPath + ":shop"
 	gnominersDashboard = gnominersPath + ":dashboard"
+	gnominersAchievements = gnominersPath + ":achievements"
 )
 
 var redirectionsPath = map[string]func(params map[string]string) string {
 	"shop": renderShop,
 	"dashboard": renderDashboard,
+	"achievements": renderAchievements,
 }
 
 // the rendering

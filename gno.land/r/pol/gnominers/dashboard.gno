@@ -12,7 +12,9 @@ func Mine() {
 	for i := 0; i < int(infos.Active.HowMuchMining()); i++ {
 		gem, _ := RandomGem()
 		infos.GemsCount[gem] += 1
+		infos.hidden.overallMined += 1
 	}
+	achievements["rock"].Check(infos)
 }
 
 // The function to equip a pickaxe
@@ -27,28 +29,30 @@ func Equip(index string) {
 
 // Render the Dashboard
 func renderDashboard(params map[string]string) string {
-	// some checks
+	// Assertions
 	user, ok := params["user"]
 	if !ok {
-		return "something went wrong, missing user in params."
+		return "user is not specified. [Go back to home](" + gnominersPath + ") to select a user."
 	}
-	infos, ok := userSessions[user]
+	session, ok := userSessions[user]
 	if !ok {
-		return "the user is not logged in."
+		return "this user is not registered. [Go back to home](" + gnominersPath + ") to register."
 	}
-	_ = infos
 	
 	// the content
-	content := "# Dashboard of " + infos.GetName() + "\n"
+	content := "# Dashboard of " + session.GetName() + "\n"
 
 	// actions
 	content += "### Actions\n"
 	lnk := txlink.Call("Mine")
-	content += "[Mine](" + lnk + ")  -  [Shop](" + gnominersShopPath + "?user=" + user + ")" + "\n\n"
+	content += "[Mine](" + lnk + ") - "
+	content += "[Shop](" + gnominersShopPath + "?user=" + user + ") - "
+	content += "[Achievements](" + gnominersAchievements + "?user=" + user + ")"
+	content += "\n\n"
 
 	// money money money, must be funny
 	content += "### Money\n"
-	content += "Currently, you have " + strconv.FormatFloat(infos.Money, 'f', 2, 64) + " GnoCoins\n"
+	content += "Currently, you have " + strconv.FormatFloat(session.Money, 'f', 2, 64) + " GnoCoins\n"
 
 	// your gems
 	content += "### Your Gems\n"
@@ -56,7 +60,7 @@ func renderDashboard(params map[string]string) string {
 	content += "|-|-|-|\n"
 	var gem gemType = gemRock 
 	for gem < _gemEnd {
-		count, ok := infos.GemsCount[gem]
+		count, ok := session.GemsCount[gem]
 		if !ok {
 			count = 0
 		}
@@ -72,9 +76,9 @@ func renderDashboard(params map[string]string) string {
 	content += "### Your inventory\n"
 	content += "|Pickaxe|Equip|\n"
 	content += "|-|-|\n"
-	for index, pick := range infos.Pickaxes {
+	for index, pick := range session.Pickaxes {
 		content += "|" + pick.String() + "|"
-		if pick != infos.Active {
+		if pick != session.Active {
 			tx := txlink.Call("Equip", "index", strconv.Itoa(index))
 			content += "[equip](" + tx + ")"
 		}

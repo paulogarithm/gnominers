@@ -8,7 +8,13 @@ import (
 )
 
 // The user table
+type hiddenData struct {
+	overallMined uint
+	achievements []IAchievement
+}
+
 type UserInfo struct {
+	hidden hiddenData
 	Money float64
 	GemsCount map[gemType]uint
 	Pickaxes []IPickaxe
