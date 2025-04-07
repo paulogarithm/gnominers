@@ -7,16 +7,17 @@ import (
 
 	"gno.land/p/moul/txlink"
 	"gno.land/p/pol/dao"
+	sdao "gno.land/p/pol/dao/simple"
 )
 
-var polDao *dao.IdeaDAO
+var polDao *sdao.SimpleDAO
 var voteId int = 0
 var counter uint = 0
 
 // Init
 
 func init() {
-	polDao = dao.NewIdeaDAO()
+	polDao = sdao.NewSimpleDAO()
 }
 
 // Exported functions
@@ -53,7 +54,7 @@ func Proposal(title string, description string) {
 	// create the proposal
 	// POTENTIAL ISSUE: I had to reverse it title & description ? ill see why
 	voteId += 1
-	prop := dao.NewIdeaProposal(actor, description, title, func()error {
+	prop := sdao.NewSimpleProposal(actor, description, title, func()error {
 		counter += 1
 		return nil
 	})
@@ -125,11 +126,11 @@ func renderDAOStuff() string {
 	out := "# The pol's DAO\n"
 	out += "Go back to [home](/r/pol/home)\n\n"
 	out += "## About\n"
-	out += "Here is my DAO, based on the `IdeaDAO` in `/p/pol/dao`, go check it out !\n\n"
+	out += "Here is my DAO, based on the `SimpleDAO` in `/p/pol/dao`, go check it out !\n\n"
 	joinLink := txlink.Call("JoinDao")
 	leaveLink := txlink.Call("LeaveDao")
 	dummyVoteLink := txlink.Call("Proposal", "title", "Dummy vote #" + strconv.Itoa(voteId), "description", "Do we increment the counter ?")
-	out += "You can [Join](" + joinLink + ") or [Leave](" + leaveLink + ") the dao.\n"
+	out += "You can [Join](" + joinLink + ") or [Leave](" + leaveLink + ") the sdao.\n"
 	out += "You can also post a [Dummy Vote](" + dummyVoteLink + ") to test. (if you joined)\n\n"
 	out += "The counter is now at " + strconv.Itoa(int(counter)) + ".\n\n"
 
@@ -146,7 +147,7 @@ func renderDAOStuff() string {
 	props := polDao.GetProposals()
 	for propID := len(props) - 1; propID >= 0; propID-- {
 		iprop := props[propID]
-		prop, ok := iprop.(*dao.IdeaProposal)
+		prop, ok := iprop.(*sdao.SimpleProposal)
 		if !ok {
 			continue
 		}

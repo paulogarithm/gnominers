@@ -71,3 +71,7 @@ func (d *DAO) AssertUserIsMember(who Member) {
 	}
 }
 
+func NewDAO() DAO {
+	return DAO{members: []Member{}}
+}
+
