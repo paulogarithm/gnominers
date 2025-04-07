@@ -11,10 +11,12 @@ var randomMachine *notrandom.Machine
 const (
 	gnominersPath = "/r/pol/gnominers"
 	gnominersShopPath = gnominersPath + ":shop"
+	gnominersDashboard = gnominersPath + ":dashboard"
 )
 
 var redirectionsPath = map[string]func(params map[string]string) string {
-	"shop": displayShop,
+	"shop": renderShop,
+	"dashboard": renderDashboard,
 }
 
 // the rendering
@@ -29,8 +31,8 @@ func Render(fullpath string) string {
 	if redirect, ok := redirectionsPath[path]; ok {
 		return redirect(params)
 	}
-	if _, ok := params["user"]; ok {
-		return renderDashboard(params)
-	}
+	// if _, ok := params["user"]; ok {
+	// 	return renderDashboard(params)
+	// }
 	return renderUserPage(params)
 }

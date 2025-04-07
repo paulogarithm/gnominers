@@ -1,7 +1,6 @@
 package gnominers
 
 import (
-	"strconv"
 	"std"
 	"gno.land/r/sys/users"
 	"gno.land/p/demo/ownable"
@@ -10,7 +9,7 @@ import (
 
 // The user table
 type UserInfo struct {
-	Money uint
+	Money float64
 	GemsCount map[gemType]uint
 	Pickaxes []IPickaxe
 	Active IPickaxe
@@ -24,10 +23,12 @@ func shorten(str string, of int) string {
 
 // Display the user great
 func (u *UserInfo) GetName() string {
-	author := shorten(u.Adress.String(), 4)
+	var author string
 	user := users.ResolveAddress(u.Adress)
 	if user != nil {
 		author = "@" + user.Name()
+	} else {
+		author = shorten(u.Adress.String(), 4)
 	}
 	return author
 }
@@ -46,7 +47,7 @@ func Login() {
 		Money: 100,
 		GemsCount: map[gemType]uint{},
 		Adress: caller,
-		Pickaxes: []IPickaxe{ &NormalPickaxe{}, &SuperPickaxe{} },
+		Pickaxes: []IPickaxe{ &NormalPickaxe{} },
 		Owner: ownable.NewWithAddress(caller),
 	}
 	for gem := gemRock; gem < _gemEnd; gem++ {
@@ -63,12 +64,15 @@ func renderUserPage(map[string]string) string {
 	var content string
 	lnk := txlink.Call("Login")
 	content += "# GnoMiners\n"
-	content += "Welcome to gno miners ! Please select an user realm, or [Login](" + lnk + ") if you want to create your own.\n\n"
-	content += "## Here is all the users\n"
+	content += "Welcome to gno miners ! Please select an user realm, or [Register](" + lnk + ") if you want to create your own.\n\n"
+	content += "## Here are all the sessions:\n"
+	if len(userSessions) == 0 {
+		content += "Hmmm, looks like there is nobody for now... be the first one to play !\n"
+	}
 	for k, v := range userSessions {
-		content += "- [" + v.GetName() + "](" + gnominersPath + "?user=" + k + "): " + strconv.Itoa(int(v.Money)) + "\n"
+		content += "- Session of [" + v.GetName() + "](" + gnominersDashboard + "?user=" + k + ")\n"
 	}
 	content += "\n"
-	content += "If you want to play, you can [Login](" + lnk + ")\n"
+	content += "If you want to play, you can [Register](" + lnk + ")\n"
 	return content
 }

@@ -21,16 +21,29 @@ const (
 )
 
 var gemLootTable = map[gemType]float64{
+	gemRock: 			1,
 	gemQuartz:			0.2,
 	gemAmethyst: 		0.1,
 	gemTopaz: 			0.05,
 	gemOpal: 			0.042,
-	gemRock: 			1,
 	gemSapphire:		0.01,
 	gemEmerald: 		0.00723,
 	gemRuby: 			0.0069,
 	gemDiamond: 		0.005,
 	gemAlexandrite: 	0.001,
+}
+
+var gemPriceCaratTable = map[gemType]float64{
+	gemRock: 			0.01,
+	gemQuartz: 			1,
+	gemAmethyst: 		5,
+	gemTopaz: 			25,
+	gemOpal: 			2300,
+	gemSapphire: 		800,
+	gemEmerald: 		6500,
+	gemRuby: 			1500,
+	gemDiamond: 		15000,
+	gemAlexandrite: 	12000,
 }
 
 var gemNames = []string{

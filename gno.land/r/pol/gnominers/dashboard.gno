@@ -44,11 +44,11 @@ func renderDashboard(params map[string]string) string {
 	// actions
 	content += "### Actions\n"
 	lnk := txlink.Call("Mine")
-	content += "[Mine](" + lnk + ")  -  [Shop](" + gnominersShopPath + ")" + "\n\n"
+	content += "[Mine](" + lnk + ")  -  [Shop](" + gnominersShopPath + "?user=" + user + ")" + "\n\n"
 
 	// money money money, must be funny
 	content += "### Money\n"
-	content += "Currently, you have " + strconv.Itoa(int(infos.Money)) + " GnoCoins\n"
+	content += "Currently, you have " + strconv.FormatFloat(infos.Money, 'f', 2, 64) + " GnoCoins\n"
 
 	// your gems
 	content += "### Your Gems\n"
@@ -60,7 +60,10 @@ func renderDashboard(params map[string]string) string {
 		if !ok {
 			count = 0
 		}
-		content += "|" + gemNames[gem] + "|" + strconv.Itoa(int(count)) + "|wip|\n"
+		content += "|" + gemNames[gem]
+		content += "|" + strconv.Itoa(int(count))
+		content += "|" + strconv.FormatFloat(float64(count) * float64(gemPriceCaratTable[gem]), 'f', 2, 64)
+		content += "|\n"
 		gem++
 	}
 	content += "\n"
