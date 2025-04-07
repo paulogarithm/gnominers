@@ -35,6 +35,7 @@ func Sell() {
 	money := totalGemsPrice(session)
 	session.GemsCount = map[gemType]uint{}
 	session.Money += money
+	achievements["million"].Check(session)
 }
 
 func Buy(pickname string) {
@@ -72,6 +73,7 @@ func Buy(pickname string) {
 	session.Money -= price
 	addPickaxeAnyway:
 	session.Pickaxes = append(session.Pickaxes, pick.Clone())
+	achievements["bday"].Check(session)
 }
 
 func renderShop(params map[string]string) string {

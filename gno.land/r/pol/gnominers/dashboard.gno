@@ -13,8 +13,17 @@ func Mine() {
 		gem, _ := RandomGem()
 		infos.GemsCount[gem] += 1
 		infos.hidden.overallMined += 1
+		switch gem  {
+			case gemRock:
+				infos.hidden.rockMined += 1
+				achievements["1000rocks"].Check(infos)
+			case gemAlexandrite:
+				infos.hidden.alexandrite = true
+				achievements["alexandrite"].Check(infos)
+		}
 	}
-	achievements["rock"].Check(infos)
+	achievements["a gem"].Check(infos)
+	achievements["42k gems"].Check(infos)
 }
 
 // The function to equip a pickaxe

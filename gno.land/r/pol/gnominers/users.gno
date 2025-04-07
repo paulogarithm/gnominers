@@ -10,6 +10,8 @@ import (
 // The user table
 type hiddenData struct {
 	overallMined uint
+	rockMined uint
+	alexandrite bool
 	achievements []IAchievement
 }
 
