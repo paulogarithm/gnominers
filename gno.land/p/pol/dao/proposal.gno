@@ -27,6 +27,9 @@ type Proposal interface {
 
 	// Make someone vote
 	Vote(verdict ProposalChoice) error
+
+	// Check if its ended
+	IsEnded() bool
 }
 
 type ProposalStore interface {

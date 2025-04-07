@@ -52,6 +52,7 @@ func Proposal(title, description string) {
 
 	// create the proposal
 	// POTENTIAL ISSUE: I had to reverse it title & description ? ill see why
+	voteId += 1
 	prop := dao.NewIdeaProposal(actor, description, title, func()error {
 		counter += 1
 		return nil
@@ -68,33 +69,44 @@ func Vote(vote string, id string) {
 		panic(err)
 	}
 	prop := dao.ProposalChoice(uint(propi))
-	propId, err := strconv.Atoi(id)
+	propID, err := strconv.Atoi(id)
 	if err != nil {
 		panic(err)
 	}
 	allProps := polDao.GetProposals()
-	if propId >= len(allProps) {
+	if propID >= len(allProps) {
 		panic("propID is greater than all proposals")
 	}
 
 	// make the user vote
-	err = allProps[propId].Vote(prop)
+	err = allProps[propID].Vote(prop)
 	if err != nil {
 		panic(err)
 	}
 }
 
 func EndVote(id string) {
-	polDao.AssertUserIsMember(dao.Member(std.PreviousRealm().Address()))
+	actor := dao.Member(std.PreviousRealm().Address())
+	polDao.AssertUserIsMember(actor)
 
 	// get the id
-	propId, err := strconv.Atoi(id)
+	propID, err := strconv.Atoi(id)
 	if err != nil {
 		panic(err)
 	}
 	allProps := polDao.GetProposals()
-	if propId >= len(allProps) {
+	if propID >= len(allProps) {
 		panic("propID is greater than all proposals")
+	}
+
+	// end the vote (only if its the user)
+	prop := allProps[propID]
+	if prop.GetAuthor() != actor {
+		panic("the actor is not the author")
+	}
+	err = prop.ExecuteIfAccepted()
+	if err != nil {
+		panic(err)
 	}
 }
 
@@ -104,18 +116,20 @@ func renderIntroduction() string {
 	out := "# Welcome to the `pol` gno page !\n"
 	out += "Hi my name is Paul, I'm a developer and welcome to my page !\n\n"
 	out += "### Go check out my super game: [gnomining](/r/pol/gnomining) !\n\n"
+	out += "### Check out my own [DAO implementation](/r/pol/home:dao) !"
 	return out
 }
 
 func renderDAOStuff() string {
 	// display the infos
-	out := "## Pol DAO\n"
+	out := "# The pol's DAO\n"
+	out += "Go back to [home](/r/pol/home)\n\n"
 	out += "## About\n"
 	out += "Here is my DAO, based on the `IdeaDAO` in `/p/pol/dao`, go check it out !\n\n"
 	joinLink := txlink.Call("JoinDao")
 	leaveLink := txlink.Call("LeaveDao")
 	dummyVoteLink := txlink.Call("Proposal", "title", "Dummy vote #" + strconv.Itoa(voteId), "description", "Do we increment the counter ?")
-	out += "You can [Join](" + joinLink + ") or [Leave](" + leaveLink + ") the dao.\n\n"
+	out += "You can [Join](" + joinLink + ") or [Leave](" + leaveLink + ") the dao.\n"
 	out += "You can also post a [Dummy Vote](" + dummyVoteLink + ") to test. (if you joined)\n\n"
 	out += "The counter is now at " + strconv.Itoa(int(counter)) + ".\n\n"
 
@@ -129,19 +143,26 @@ func renderDAOStuff() string {
 	// display the dao proposals
 	out += "## Propositions\n"
 	out += "---\n"
-	for propId, iprop := range polDao.GetProposals() {
+	props := polDao.GetProposals()
+	for propID := len(props) - 1; propID >= 0; propID-- {
+		iprop := props[propID]
 		prop, ok := iprop.(*dao.IdeaProposal)
 		if !ok {
 			continue
 		}
+		if prop.IsEnded() {
+			out += "> [ended] " + prop.Title + "\n\n---\n\n"
+			continue
+		}
 		out += "### " + prop.Title + "\n"
 		out += prop.Description + "\n\n"
+		out += "> by " + iprop.GetAuthor().Address().String() + "\n\n"
 		var lnk string
 		for k, v := range polDao.GetChoicesNames() {
-			lnk = txlink.Call("Vote", "vote", strconv.Itoa(int(k)), "id",  strconv.Itoa(propId))
+			lnk = txlink.Call("Vote", "vote", strconv.Itoa(int(k)), "id",  strconv.Itoa(propID))
 			out += "[" + v + "](" + lnk + ") "
 		}
-		lnk = txlink.Call("EndVote", "id", strconv.Itoa(propId))
+		lnk = txlink.Call("EndVote", "id", strconv.Itoa(propID))
 		out += "([End Vote](" + lnk + "))\n\n---\n\n" 
 	}
 	out += "\n"
@@ -149,9 +170,8 @@ func renderDAOStuff() string {
 }
 
 func Render(path string) string {
-	var out string
-	out += renderIntroduction()
-	out += "---\n"
-	out += renderDAOStuff()
-	return out
+	if path == "dao" {
+		return renderDAOStuff()
+	}
+	return renderIntroduction()
 }

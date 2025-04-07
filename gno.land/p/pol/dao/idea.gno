@@ -43,6 +43,7 @@ type IdeaProposal struct {
 	voters []Member 				// The ones who alread votes.
 	expires time.Time				// When does the poll expires.
 	executor *IdeaExecutor			// Execute the poll
+	alive bool						// If the poll is alive
 }
 
 func (p *IdeaProposal) GetAuthor() Member {
@@ -56,6 +57,9 @@ func (p *IdeaProposal) IsAccepted() bool {
 	for _, v := range p.votes {
 		total += float64(v)
 	}
+	if (total == 0) {
+		return false
+	}
 	if (float64(p.votes[IdeaWhiteVote]) / total) > 0.5 {
 		return false
 	}
@@ -63,6 +67,7 @@ func (p *IdeaProposal) IsAccepted() bool {
 }
 
 func (p *IdeaProposal) ExecuteIfAccepted() error {
+	p.alive = false
 	if p.IsAccepted() {
 		return p.executor.f()
 	}
@@ -88,6 +93,10 @@ func (p *IdeaProposal) Vote(verdict ProposalChoice) error {
 	return nil
 }
 
+func (p *IdeaProposal) IsEnded() bool {
+	return !p.alive
+}
+
 func NewIdeaProposal(who Member, title, desc string, f func()error) *IdeaProposal {
 	exp := time.Now().Add(time.Minute) // One minute for now
 	x := &IdeaProposal{
@@ -98,6 +107,7 @@ func NewIdeaProposal(who Member, title, desc string, f func()error) *IdeaProposa
 		voters: []Member{},
 		expires: exp,
 		executor: NewIdeaExecutor(f),
+		alive: true,
 	}
 	for n := IdeaAccepted; n < IdeaChoiceCount; n++ {
 		x.votes[n] = 0
