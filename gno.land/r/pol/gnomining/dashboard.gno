@@ -40,7 +40,7 @@ func renderDashboard(params map[string]string) string {
 	_ = infos
 	
 	// the content
-	content := "# Dashboard of " + shorten(user, 4) + "\n"
+	content := "# Dashboard of " + infos.GetName() + "\n"
 
 	// actions
 	content += "### Actions\n"
