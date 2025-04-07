@@ -50,17 +50,18 @@ func (p *IdeaProposal) GetAuthor() Member {
 	return p.author
 }
 
+func (p *IdeaProposal) HowManyVoters() uint {
+	return uint(len(p.voters))
+}
+
 // In this vote system, if >50% of the votes are White, its refused
 // Else, its just the most between Accepted & Rejected.
 func (p *IdeaProposal) IsAccepted() bool {
-	total := 0.
-	for _, v := range p.votes {
-		total += float64(v)
-	}
+	total := len(p.voters)
 	if (total == 0) {
 		return false
 	}
-	if (float64(p.votes[IdeaWhiteVote]) / total) > 0.5 {
+	if (float64(p.votes[IdeaWhiteVote]) / float64(total)) > 0.5 {
 		return false
 	}
 	return p.votes[IdeaAccepted] > p.votes[IdeaRejected]

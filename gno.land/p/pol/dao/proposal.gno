@@ -28,6 +28,9 @@ type Proposal interface {
 	// Make someone vote
 	Vote(verdict ProposalChoice) error
 
+	// Check out how many people voted
+	HowManyVoters() uint
+
 	// Check if its ended
 	IsEnded() bool
 }
