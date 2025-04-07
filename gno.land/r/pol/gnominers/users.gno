@@ -1,4 +1,4 @@
-package gnomining
+package gnominers
 
 import (
 	"strconv"
@@ -33,12 +33,12 @@ func (u *UserInfo) GetName() string {
 }
 
 // The list of users
-var USERS = map[string]*UserInfo{}
+var userSessions = map[string]*UserInfo{}
 
 // The function to log a new user with default values
 func Login() {
 	caller := std.PreviousRealm().Address()
-	infos, ok := USERS[caller.String()]
+	infos, ok := userSessions[caller.String()]
 	if ok {
 		panic("user already registered")
 	}
@@ -49,23 +49,26 @@ func Login() {
 		Pickaxes: []IPickaxe{ &NormalPickaxe{}, &SuperPickaxe{} },
 		Owner: ownable.NewWithAddress(caller),
 	}
-	for gem := GEM_ROCK; gem < _GEM_END; gem++ {
+	for gem := gemRock; gem < _gemEnd; gem++ {
 		infos.GemsCount[gem] = 0
 		gem++
 	}
 	infos.Active = infos.Pickaxes[0]
-	USERS[caller.String()] = infos
+	userSessions[caller.String()] = infos
 	return
 }
 
 // The function to render the user page
 func renderUserPage(map[string]string) string {
-	content := "## Here is all the users\n"
-	for k, v := range USERS {
-		content += "- [" + v.GetName() + "](" + GM_PATH + "?user=" + k + "): " + strconv.Itoa(int(v.Money)) + "\n"
+	var content string
+	lnk := txlink.Call("Login")
+	content += "# GnoMiners\n"
+	content += "Welcome to gno miners ! Please select an user realm, or [Login](" + lnk + ") if you want to create your own.\n\n"
+	content += "## Here is all the users\n"
+	for k, v := range userSessions {
+		content += "- [" + v.GetName() + "](" + gnominersPath + "?user=" + k + "): " + strconv.Itoa(int(v.Money)) + "\n"
 	}
 	content += "\n"
-	lnk := txlink.Call("Login")
-	content += "if you want to play, you can [login](" + lnk + ")\n"
+	content += "If you want to play, you can [Login](" + lnk + ")\n"
 	return content
 }

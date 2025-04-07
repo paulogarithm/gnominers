@@ -1,4 +1,4 @@
-package gnomining
+package gnominers
 
 type IPickaxe interface{
 	HowMuchMining() uint

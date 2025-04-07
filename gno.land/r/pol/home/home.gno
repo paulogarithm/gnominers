@@ -35,7 +35,7 @@ func LeaveDao() {
 	}
 }
 
-func Proposal(title, description string) {
+func Proposal(title string, description string) {
 	// unescape the strings
 	title, err := url.QueryUnescape(title)
 	if err != nil {
@@ -115,7 +115,7 @@ func EndVote(id string) {
 func renderIntroduction() string {
 	out := "# Welcome to the `pol` gno page !\n"
 	out += "Hi my name is Paul, I'm a developer and welcome to my page !\n\n"
-	out += "### Go check out my super game: [gnomining](/r/pol/gnomining) !\n\n"
+	out += "### Go check out my super game: [gnominers](/r/pol/gnominers) !\n\n"
 	out += "### Check out my own [DAO implementation](/r/pol/home:dao) !"
 	return out
 }

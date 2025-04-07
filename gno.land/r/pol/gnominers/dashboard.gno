@@ -1,4 +1,4 @@
-package gnomining
+package gnominers
 
 import (
 	"strconv"
@@ -10,7 +10,6 @@ func Mine() {
 	infos := assertCallerExists()
 	infos.Owner.AssertCallerIsOwner()
 	for i := 0; i < int(infos.Active.HowMuchMining()); i++ {
-		// gem, _ := RandomGem(RANDOM_MACHINE)
 		gem, _ := RandomGem()
 		infos.GemsCount[gem] += 1
 	}
@@ -33,7 +32,7 @@ func renderDashboard(params map[string]string) string {
 	if !ok {
 		return "something went wrong, missing user in params."
 	}
-	infos, ok := USERS[user]
+	infos, ok := userSessions[user]
 	if !ok {
 		return "the user is not logged in."
 	}
@@ -45,7 +44,7 @@ func renderDashboard(params map[string]string) string {
 	// actions
 	content += "### Actions\n"
 	lnk := txlink.Call("Mine")
-	content += "[Mine](" + lnk + ")  -  [Shop](" + GM_SHOPPATH + ")" + "\n\n"
+	content += "[Mine](" + lnk + ")  -  [Shop](" + gnominersShopPath + ")" + "\n\n"
 
 	// money money money, must be funny
 	content += "### Money\n"
@@ -55,13 +54,13 @@ func renderDashboard(params map[string]string) string {
 	content += "### Your Gems\n"
 	content += "|Gem|Quantity|Price|\n"
 	content += "|-|-|-|\n"
-	var gem gemType = GEM_ROCK 
-	for gem < _GEM_END {
+	var gem gemType = gemRock 
+	for gem < _gemEnd {
 		count, ok := infos.GemsCount[gem]
 		if !ok {
 			count = 0
 		}
-		content += "|" + GEMNAMES[gem] + "|" + strconv.Itoa(int(count)) + "|wip|\n"
+		content += "|" + gemNames[gem] + "|" + strconv.Itoa(int(count)) + "|wip|\n"
 		gem++
 	}
 	content += "\n"
